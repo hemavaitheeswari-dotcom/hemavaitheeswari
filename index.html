@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGenie - AI Learning Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Include Marked.js via CDN for automated Markdown rendering -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🎓 EduGenie</h1>
+            <p>Google Gemini Powered Learning Assistant</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card form-section">
+            <h2>Select Learning Assistant Feature</h2>
+            <form action="/action" method="post">
+                <div class="form-group">
+                    <label for="mode">What would you like to do?</label>
+                    <select name="mode" id="mode" required onchange="updatePlaceholder()">
+                        <option value="ask" {% if mode == 'ask' %}selected{% endif %}>Ask a Question (Concise Answers)</option>
+                        <option value="simplify" {% if mode == 'simplify' %}selected{% endif %}>Simplify a Complex Concept</option>
+                        <option value="quiz" {% if mode == 'quiz' %}selected{% endif %}>Generate a Quiz</option>
+                        <option value="recommend" {% if mode == 'recommend' %}selected{% endif %}>Get a Learning Path / Recommendations</option>
+                        <option value="summarize" {% if mode == 'summarize' %}selected{% endif %}>Summarize Educational Text</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="input_text">Your Input Text:</label>
+                    <textarea name="input_text" id="input_text" rows="6" placeholder="Enter your query or text here..." required>{{ input_text if input_text else '' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn">Submit Request</button>
+            </form>
+        </section>
+
+        {% if result %}
+        <section class="card result-section">
+            <h2>✨ EduGenie Response</h2>
+            <!-- Hidden container containing raw markdown from Python -->
+            <textarea id="raw-markdown" style="display:none;">{{ result }}</textarea>
+            <!-- Target element for rendered rich markdown layout -->
+            <div id="response-content" class="response-content"></div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script>
+        function updatePlaceholder() {
+            const mode = document.getElementById('mode').value;
+            const textarea = document.getElementById('input_text');
+            
+            if (mode === 'ask') {
+                textarea.placeholder = "e.g., Which is the largest ocean?";
+            } else if (mode === 'simplify') {
+                textarea.placeholder = "e.g., Quantum Computing or Theory of Relativity...";
+            } else if (mode === 'quiz') {
+                textarea.placeholder = "e.g., The Pythagoras Theorem";
+            } else if (mode === 'recommend') {
+                textarea.placeholder = "e.g., Structured plan for learning SQL...";
+            } else if (mode === 'summarize') {
+                textarea.placeholder = "Paste a large educational passage here to summarize...";
+            }
+        }
+
+        // Render Markdown content dynamically on load lifecycle
+        window.onload = function() {
+            updatePlaceholder();
+            
+            const rawMarkdownEl = document.getElementById('raw-markdown');
+            if (rawMarkdownEl) {
+                const rawMarkdown = rawMarkdownEl.value;
+                // Parse markdown content dynamically into clean rich elements
+                document.getElementById('response-content').innerHTML = marked.parse(rawMarkdown);
+            }
+        };
+    </script>
+</body>
+</html>
